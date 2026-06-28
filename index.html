@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Post-mortem constructivo: error 403 en Eco-Track</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      line-height: 1.6;
+      padding: 0 20px;
+      color: #222;
+    }
+    h1, h2, h3 {
+      color: #1f2937;
+    }
+    code {
+      background: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background: #f3f4f6;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Post-mortem constructivo: error 403 en la integración de API de mapas de Eco-Track</h1>
+
+<h2>Contexto</h2>
+
+<p>
+Eco-Track es un proyecto orientado al seguimiento de rutas y ubicaciones mediante una API de mapas. Durante el cierre de un sprint, el equipo estaba trabajando en el ticket <strong>ECO-42: Integración de API de mapas</strong>.
+</p>
+
+<p>
+El objetivo de la tarea era conectar el frontend con el servicio de mapas para mostrar ubicaciones dentro de la aplicación. La integración era importante porque permitía avanzar con pruebas de QA y validar una funcionalidad central del producto.
+</p>
+
+<p>
+El equipo trabajaba de forma remota, utilizando Slack para comunicación asincrónica, Jira para seguimiento de tickets y GitHub para control de versiones.
+</p>
+
+<h2>Problema</h2>
+
+<p>
+Durante la integración, el <code>auth_token</code> utilizado para consumir la API de mapas comenzó a devolver un error <code>403</code>.
+</p>
+
+<p>
+El error <code>403</code> indica que la solicitud fue recibida por el servidor, pero no tiene permisos suficientes para acceder al recurso solicitado.
+</p>
+
+<p>
+El problema bloqueó el avance del ticket porque no se podía confirmar si la causa era:
+</p>
+
+<ul>
+  <li>token vencido;</li>
+  <li>permisos insuficientes;</li>
+  <li>cambio en el endpoint;</li>
+  <li>documentación interna desactualizada;</li>
+  <li>configuración incorrecta del ambiente de staging.</li>
+</ul>
+
+<p>
+Desde una perspectiva no técnica, el impacto era claro: la funcionalidad de mapas no podía probarse ni validarse, por lo tanto, QA no podía avanzar con la revisión del flujo completo.
+</p>
+
+<h2>Acciones tomadas</h2>
+
+<p>
+Para abordar el incidente, se aplicó un enfoque de investigación ordenado y sin culpas.
+</p>
+
+<p>
+Primero, se documentó el bloqueo en el ticket <strong>ECO-42</strong>, incluyendo el contexto, el error observado y los intentos realizados.
+</p>
+
+<ul>
+  <li>Verificación del header donde se enviaba el token.</li>
+  <li>Prueba del endpoint desde Postman.</li>
+  <li>Revisión de la documentación interna.</li>
+  <li>Comparación de variables del archivo <code>.env</code>.</li>
+  <li>Regeneración del token en ambiente de staging.</li>
+  <li>Consulta asincrónica al equipo de Backend/Auth.</li>
+  <li>Registro del bloqueo en Jira.</li>
+  <li>Comunicación del impacto a QA y Tech Lead.</li>
+  <li>Propuesta de actualizar la documentación técnica.</li>
+</ul>
+
+<h2>Mensaje asincrónico utilizado</h2>
+
+<p>
+Estoy trabajando en el ticket ECO-42 de integración de API de mapas. El <code>auth_token</code> devuelve error <code>403</code> y la documentación interna parece estar desactualizada. Ya probé regenerar el token, validar headers y revisar el endpoint desde Postman. ¿Alguien de Backend/Auth podría confirmar si el token actual tiene permisos vigentes o si cambió el flujo de autenticación? Necesito confirmarlo antes de las 16:00 para no afectar las pruebas de QA.
+</p>
+
+<h2>Post-mortem constructivo</h2>
+
+<h3>Qué ocurrió</h3>
+
+<p>
+El equipo detectó que la documentación interna sobre autenticación de la API de mapas no estaba actualizada. Esto generó confusión sobre el uso correcto del token y los permisos necesarios.
+</p>
+
+<h3>Causa raíz probable</h3>
+
+<p>
+La causa principal fue una combinación de documentación desactualizada y falta de una validación clara sobre permisos del token en ambiente de staging.
+</p>
+
+<h3>Factores contribuyentes</h3>
+
+<ul>
+  <li>No existía una sección específica sobre errores frecuentes de autenticación.</li>
+  <li>El flujo para regenerar o validar tokens no estaba documentado.</li>
+  <li>El ticket no indicaba a quién escalar problemas de permisos.</li>
+  <li>No había un checklist previo para validar integraciones externas.</li>
+</ul>
+
+<h3>Qué funcionó bien</h3>
+
+<ul>
+  <li>El bloqueo se comunicó de forma temprana.</li>
+  <li>Se documentaron los intentos realizados antes de pedir ayuda.</li>
+  <li>El equipo evitó convocar una reunión innecesaria al inicio.</li>
+  <li>Se dejó trazabilidad en Jira y Slack.</li>
+  <li>El feedback se mantuvo enfocado en el proceso y no en personas.</li>
+</ul>
+
+<h3>Qué se puede mejorar</h3>
+
+<ul>
+  <li>Actualizar documentación técnica después de cambios en autenticación.</li>
+  <li>Agregar una sección de errores frecuentes.</li>
+  <li>Definir responsables para validar permisos de APIs externas.</li>
+  <li>Crear un checklist previo para integraciones.</li>
+  <li>Establecer un proceso de revisión de documentación antes del cierre de sprint.</li>
+</ul>
+
+<h2>Decisiones tomadas</h2>
+
+<table>
+  <tr>
+    <th>Acción</th>
+    <th>Responsable</th>
+    <th>Deadline</th>
+  </tr>
+  <tr>
+    <td>Validar permisos del token en staging</td>
+    <td>Backend/Auth</td>
+    <td>Antes del cierre del sprint</td>
+  </tr>
+  <tr>
+    <td>Actualizar documentación de autenticación</td>
+    <td>Tech Lead / Backend</td>
+    <td>Próximo sprint</td>
+  </tr>
+  <tr>
+    <td>Agregar sección de errores frecuentes</td>
+    <td>Equipo técnico</td>
+    <td>Próximo sprint</td>
+  </tr>
+  <tr>
+    <td>Crear checklist para integraciones externas</td>
+    <td>Frontend + Backend</td>
+    <td>Próxima retrospectiva</td>
+  </tr>
+  <tr>
+    <td>Documentar el caso como aprendizaje</td>
+    <td>Persona responsable del ticket</td>
+    <td>Al cierre del PR</td>
+  </tr>
+</table>
+
+<h2>Aprendizajes</h2>
+
+<p>
+Este incidente permitió identificar que no todos los bloqueos técnicos se resuelven únicamente revisando código. A veces, el problema está en la falta de documentación clara, en procesos incompletos o en dependencias entre equipos.
+</p>
+
+<ul>
+  <li>Documentar bien ahorra tiempo.</li>
+  <li>Un mensaje claro reduce reuniones innecesarias.</li>
+  <li>La evidencia visual y los pasos reproducibles aceleran la resolución.</li>
+  <li>Los post-mortems deben buscar aprendizaje, no culpables.</li>
+  <li>El control de versiones permite dejar trazabilidad del proceso.</li>
+  <li>La comunicación asincrónica funciona mejor cuando hay contexto, acción y deadline.</li>
+  <li>La seguridad importa: no se deben compartir tokens ni credenciales en canales abiertos.</li>
+</ul>
+
+<h2>Uso de control de versiones</h2>
+
+<p>
+Para documentar el proceso, se utilizó GitHub como herramienta de control de versiones. Se creó una rama específica llamada <code>feature/postmortem-api-maps-403</code> y se realizaron commits descriptivos para evidenciar la evolución del blog técnico.
+</p>
+
+<h2>Reflexión sobre feedback radicalmente sincero</h2>
+
+<p>
+Durante el proceso, el feedback se aplicó siguiendo los principios de Radical Candor, combinando cuidado personal con desafío directo.
+</p>
+
+<p>
+El desafío directo consistió en señalar que la documentación técnica estaba incompleta y que eso estaba afectando el avance del ticket. Sin embargo, el mensaje se formuló sin culpar a una persona específica. Se habló del proceso, del impacto y de las mejoras necesarias.
+</p>
+
+<p>
+Un ejemplo de feedback aplicado sería:
+</p>
+
+<blockquote>
+Gracias por la documentación inicial de la API de mapas. Me ayudó a entender el flujo general, pero durante la integración detecté que falta información sobre autenticación, permisos del token y manejo del error 403. Esto generó un bloqueo en el ticket ECO-42. ¿Podríamos sumar una sección con esos casos para que futuras integraciones sean más claras?
+</blockquote>
+
+<p>
+Este enfoque permite comunicar un problema real sin atacar a nadie. Además, transforma el error en una oportunidad de aprendizaje compartido.
+</p>
+
+<h2>Conclusión</h2>
+
+<p>
+El error <code>403</code> en la integración de la API de mapas fue un bloqueo técnico, pero también una oportunidad para mejorar la documentación, la comunicación asincrónica y los procesos de escalamiento.
+</p>
+
+<p>
+El post-mortem constructivo permitió identificar causas, aprendizajes y acciones preventivas. Además, el uso de GitHub aportó trazabilidad al proceso y ayudó a mostrar cómo evolucionó la documentación.
+</p>
+
+<p>
+En equipos remotos, comunicar con claridad, documentar decisiones y dar feedback sincero con empatía son habilidades tan importantes como resolver el problema técnico en sí.
+</p>
+
+</body>
+</html>
