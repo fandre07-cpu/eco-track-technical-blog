@@ -12,13 +12,15 @@ Documentar el contexto, problema, acciones tomadas, aprendizajes, evidencia de c
 
 ## Blog publicado
 
-La URL pública se agregará cuando GitHub Pages esté configurado.
+URL pública del blog:
+
+https://fandre07-cpu.github.io/eco-track-technical-blog/
 
 ## Checklist
 
 - [x] Repositorio público creado
 - [x] README inicial creado
-- [ ] Entrada de blog agregada
-- [ ] GitHub Pages configurado
-- [ ] Blog publicado
-- [ ] Evidencia de commits incluida
+- [x] Entrada de blog agregada
+- [x] GitHub Pages configurado
+- [x] Blog publicado
+- [x] Evidencia de commits incluida
